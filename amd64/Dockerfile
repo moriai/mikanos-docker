@@ -1,14 +1,15 @@
-FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-20.04
+FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
 
 ARG USERNAME=vscode
 
 # install development tools
 RUN apt-get update \
+ && apt-get upgrade -y \
  && apt-get install -y --no-install-recommends \
     build-essential \
-    llvm-7-dev \
-    lld-7 \
-    clang-7 \
+    llvm-14-dev \
+    lld-14 \
+    clang-14 \
     nasm \
     acpica-tools \
     uuid-dev \
@@ -18,9 +19,12 @@ RUN apt-get update \
     unzip \
     # added
     qemu-system-gui \
+    gnome-session-canberra \
+    libcanberra-gtk3-module \
     dosfstools \
     git \
     python3-distutils \
+    file \
  && apt-get clean -y \
  && rm -rf /var/lib/apt/lists
 
@@ -79,7 +83,7 @@ RUN for item in \
         clang++ \
         clang-cpp \
     ; do \
-        update-alternatives --install "/usr/bin/${item}" "${item}" "/usr/bin/${item}-7" 50 \
+        update-alternatives --install "/usr/bin/${item}" "${item}" "/usr/bin/${item}-14" 50 \
     ; done
 
 # switch to unprivileged
@@ -87,19 +91,16 @@ USER ${USERNAME}
 WORKDIR /home/${USERNAME}
 
 # build EDK II
-# 38c8be123aced4cc8ad5c7e0da9121a181b94251 is known latest good version
-# do not use --depth=1 since some git upstream does not support fetching single commit?
-# still dont get it why this only happens on arm64 and not amd64
 RUN git init edk2 && \
     cd edk2 && \
     git remote add origin https://github.com/tianocore/edk2.git && \
-    git fetch --no-recurse-submodules origin 38c8be123aced4cc8ad5c7e0da9121a181b94251 && \
+    git fetch --no-recurse-submodules --depth 1 origin edk2-stable202208 && \
     git checkout FETCH_HEAD && \
-    git submodule update --init --recursive && \
+    git submodule update --init --recursive --depth 1 && \
     make -C BaseTools/Source/C
 
 # clone mikanos devenv
-RUN git clone https://github.com/uchan-nos/mikanos-build.git osbook
+RUN git clone https://github.com/moriai/mikanos-build.git -b iisec2 osbook
 
 # download standard libraries
 RUN curl -L https://github.com/uchan-nos/mikanos-build/releases/download/v2.0/x86_64-elf.tar.gz \
@@ -110,6 +111,9 @@ USER root
 
 # add ~/osbook/devenv to PATH
 ENV PATH="/home/${USERNAME}/osbook/devenv:${PATH}"
+
+# set default locale
+ENV LANG=C.UTF-8
 
 # set X11 server address
 ENV DISPLAY=host.docker.internal:0
