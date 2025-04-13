@@ -103,7 +103,7 @@ RUN git init edk2 && \
     make -C BaseTools/Source/C
 
 # clone mikanos devenv
-RUN git clone https://github.com/moriai/mikanos-build.git -b iisec2 osbook
+RUN git clone https://github.com/moriai/mikanos-build.git -b osbook2 osbook
 
 # download standard libraries
 RUN curl -L https://github.com/uchan-nos/mikanos-build/releases/download/v2.0/x86_64-elf.tar.gz \
