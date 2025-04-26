@@ -97,7 +97,7 @@ WORKDIR /home/${USERNAME}
 RUN git init edk2 && \
     cd edk2 && \
     git remote add origin https://github.com/tianocore/edk2.git && \
-    git fetch --no-recurse-submodules --depth 1 origin edk2-stable202208 && \
+    git fetch --no-recurse-submodules --depth 1 origin tag edk2-stable202208 && \
     git checkout FETCH_HEAD && \
     git submodule update --init --recursive --depth 1 && \
     make -C BaseTools/Source/C
