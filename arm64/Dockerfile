@@ -21,6 +21,7 @@ RUN apt-get update \
     qemu-system-gui \
     gnome-session-canberra \
     libcanberra-gtk3-module \
+    librsvg2-common \
     dosfstools \
     git \
     file \
