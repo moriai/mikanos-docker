@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu-22.04
 
 ARG USERNAME=vscode
+ARG USERID=1000
 
 # install development tools
 RUN apt-get update \
@@ -60,5 +61,10 @@ ENV LANG=C.UTF-8
 # set X11 server address
 ENV DISPLAY=host.docker.internal:0
 
+# make /run/user directory for X11, Wayland, and etc
+WORKDIR /run/user/${USERID}
+RUN chown ${USERNAME}:${USERNAME} . && chmod 700 .
+
 # override startup command, taken from VSCode Devcontainer logs
+WORKDIR /home/${USERNAME}
 CMD ["/bin/sh", "-c", "echo Container started ; trap \"exit 0\" 15; while sleep 1 & wait $!; do :; done"]
