@@ -45,6 +45,9 @@ RUN git init edk2 && \
     git submodule update --init --recursive --depth 1 && \
     make -C BaseTools/Source/C
 
+# copy patch EDK II for arm64
+COPY --chown=${USERNAME} tools_def.txt.patch edk2/
+
 # clone mikanos devenv
 RUN git clone https://github.com/moriai/mikanos-build.git -b osbook2 osbook
 
